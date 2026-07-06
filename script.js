@@ -145,7 +145,12 @@ tabs.forEach(tab => {
     const filter = tab.dataset.filter;
     document.querySelectorAll(".g-item").forEach(item => {
       const match = filter === "all" || item.dataset.category === filter;
-      item.classList.toggle("hidden", !match);
+      if (match){
+        item.classList.remove("hidden", "fade-out");
+      } else {
+        item.classList.add("fade-out");
+        setTimeout(() => item.classList.add("hidden"), 250);
+      }
     });
   });
 });
@@ -231,3 +236,39 @@ document.getElementById("pdfLink").addEventListener("click", (e) => {
   e.preventDefault();
   alert("Add your portfolio PDF to the assets folder and update the #pdfLink href in index.html.");
 });
+
+/* ===================================================================
+   SCROLL-REVEAL ANIMATIONS
+=================================================================== */
+const revealEls = document.querySelectorAll(".reveal");
+if ("IntersectionObserver" in window && revealEls.length){
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting){
+        entry.target.classList.add("in-view");
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  revealEls.forEach(el => revealObserver.observe(el));
+} else {
+  revealEls.forEach(el => el.classList.add("in-view"));
+}
+
+/* ===================================================================
+   ACTIVE NAV LINK ON SCROLL
+=================================================================== */
+const sections = document.querySelectorAll("section[id]");
+const navLinks = document.querySelectorAll(".main-nav a");
+if ("IntersectionObserver" in window && sections.length){
+  const navObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting){
+        navLinks.forEach(link => {
+          link.classList.toggle("active", link.getAttribute("href") === `#${entry.target.id}`);
+        });
+      }
+    });
+  }, { rootMargin: "-45% 0px -45% 0px" });
+  sections.forEach(section => navObserver.observe(section));
+}
