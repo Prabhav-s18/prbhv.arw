@@ -272,3 +272,39 @@ if ("IntersectionObserver" in window && sections.length){
   }, { rootMargin: "-45% 0px -45% 0px" });
   sections.forEach(section => navObserver.observe(section));
 }
+
+
+/* ===================================================================
+   RAW VS EDITED SLIDER
+=================================================================== */
+
+
+(function () {
+  const slider = document.getElementById('baSlider');
+  const before = slider.querySelector('.ba-before');
+  const handle = slider.querySelector('.ba-handle');
+  let dragging = false;
+
+  function setPosition(percent) {
+    percent = Math.max(0, Math.min(100, percent));
+    before.style.clipPath = `inset(0 ${100 - percent}% 0 0)`;
+    handle.style.left = `${percent}%`;
+  }
+
+  function getPercentFromEvent(e) {
+    const rect = slider.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    return ((clientX - rect.left) / rect.width) * 100;
+  }
+
+  slider.addEventListener('mousedown', (e) => { dragging = true; setPosition(getPercentFromEvent(e)); });
+  slider.addEventListener('touchstart', (e) => { dragging = true; setPosition(getPercentFromEvent(e)); });
+
+  window.addEventListener('mousemove', (e) => { if (dragging) setPosition(getPercentFromEvent(e)); });
+  window.addEventListener('touchmove', (e) => { if (dragging) setPosition(getPercentFromEvent(e)); });
+
+  window.addEventListener('mouseup', () => dragging = false);
+  window.addEventListener('touchend', () => dragging = false);
+
+  setPosition(50); // starting position
+})();
